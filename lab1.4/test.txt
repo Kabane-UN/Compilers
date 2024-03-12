@@ -1,0 +1,3 @@
+open << clos1
+"ejafjsjfekesfk
+adsffa" >> close

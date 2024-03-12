@@ -1,0 +1,69 @@
+(1|2|3|4|5|6|7|8|9|0)(1|2|3|4|5|6|7|8|9|0)*
+(a)(a|1)*
+(\n|\t| )
+open|close
+<<|>>
+"(y|\")*"
+
+digraph {
+    rankdir=LR ;
+    Start0 [shape=circle]
+    Number1 [shape=doublecircle]
+    WhiteSpace2 [shape=doublecircle]
+    Ident3 [shape=doublecircle]
+    keyword4 [shape=doublecircle]
+    str5 [shape=doublecircle]
+    Oper6  [shape=doublecircle]
+    s7 [shape=circle]
+    s8 [shape=circle]
+    Ident9 [shape=circle]
+    Ident10 [shape=circle]
+    Ident11 [shape=circle]
+    Ident12 [shape=circle]
+    Ident13 [shape=circle]
+    Ident14 [shape=circle]
+    Ident15 [shape=circle]
+    s16 [shape=circle]
+    s17 [shape=circle]
+    s18 [shape=circle]
+    
+    Start0 -> Number1[label = "DIGIT/0"]
+    Number1 -> Number1[label = "DIGIT"]
+    
+    Start0 -> WhiteSpace2[label = "_,\\t,\\n"]
+    WhiteSpace2 -> WhiteSpace2[label =  "_,\\t,\\n"]
+    Start0 -> s7[label = "KOVICHKA"]
+    s7 -> s7[label = "Any/\\"]
+    s7 -> s8[label = "\\"]
+    s8 -> s7[label = "Any"]
+    s7 -> str5[label = "KOVICHKA"]
+    
+
+    Start0 -> Ident3[label = "LETTER/{o, c}"]
+    Ident3 -> Ident3[label = "LETTER, DIGIT"]
+    
+    Start0 -> Ident9[label = "o"]
+    Ident9 -> Ident10[label = "p"]
+    Ident9 -> Ident3[label = "ELSE"]
+    Ident10 -> Ident11[label = "e"]
+    Ident10 -> Ident3[label = "ELSE"]
+    Ident11 -> keyword4[label = "n"]
+    Ident11 -> Ident3[label = "ELSE"]
+    Start0 -> Ident12[label = "c"]
+     
+    Ident12 -> Ident13[label = "l"]
+    Ident12 -> Ident3[label = "ELSE"]
+    Ident13 -> Ident14[label = "o"]
+    Ident13 -> Ident3[label = "ELSE"]
+    Ident14 -> Ident15[label = "s"]
+    Ident14 -> Ident3[label = "ELSE"]
+    Ident15 -> keyword4[label = "e"]
+    Ident15 -> Ident3[label = "ELSE"]
+    
+    
+    Start0 -> s16[label = "<"]
+    Start0 -> s17[label = ">"]
+    s16 -> Oper6[label = "<"]
+    s17 -> Oper6[label = ">"]
+    
+}
