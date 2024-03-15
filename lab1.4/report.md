@@ -1,3 +1,180 @@
+% Лабораторная работа № 1.4 «Лексический распознаватель»
+% 11 марта 2024 г.
+% Андрей Кабанов, ИУ9-62Б
+
+# Цель работы
+Целью данной работы является изучение использования детерминированных конечных автоматов 
+с размеченными заключительными состояниями (лексических распознавателей) для решения 
+задачи лексического анализа.
+
+# Индивидуальный вариант
+`open`, `close`, `<<`, `>>`, строковые литералы ограничены одинарными кавычками, для 
+включения кавычки в строковой литерал она предваряется знаком `«\»`, могут пересекать 
+границы строк текста.
+
+# Реализация
+
+Лексическая структура языка — регулярные выражения для доменов:
+
+* `(DIGIT\0)(DIGIT)*` -> Number
+* `(\n|\t| )+` -> WhiteSpace
+* `open|close` -> Keyword
+* `"(Any|\")*"` -> String
+* `<<|>>` -> Operator
+* `(LETTER\{o,c})(LETTER|DIGIT)*` -> Ident
+
+Граф недетерминированного распознавателя:
+
+```dot
+digraph {
+    rankdir=LR ;
+    Start0 [shape=circle]
+    Number1 [shape=doublecircle]
+    WhiteSpace2 [shape=doublecircle]
+    Ident3 [shape=doublecircle]
+    keyword4 [shape=doublecircle]
+    str5 [shape=doublecircle]
+    Oper6  [shape=doublecircle]
+    s7 [shape=circle]
+    s8 [shape=circle]
+    Ident9 [shape=circle]
+    Ident10 [shape=circle]
+    Ident11 [shape=circle]
+    Ident12 [shape=circle]
+    Ident13 [shape=circle]
+    Ident14 [shape=circle]
+    Ident15 [shape=circle]
+    s16 [shape=circle]
+    s17 [shape=circle]
+    
+    StartNumber18 [shape=circle]
+    StartWhiteSpace19 [shape=circle]
+    StartIdent20 [shape=circle]
+    StartOper21 [shape=circle]
+    StartKeyword22 [shape=circle]
+    StartStr23 [shape=circle]
+
+    
+    Start0 -> StartNumber18[label = "eps"]
+    StartNumber18 -> Number1[label = "DIGIT/0"]
+    Number1 -> Number1[label = "DIGIT"]
+    
+    Start0 -> StartWhiteSpace19[label = "eps"]
+    StartWhiteSpace19 -> WhiteSpace2[label = "_,\\t,\\n"]
+    WhiteSpace2 -> WhiteSpace2[label =  "_,\\t,\\n"]
+    Start0 -> StartStr23[label = "eps"]
+    StartStr23 -> s7[label = "KOVICHKA"]
+    s7 -> s7[label = "Any/{\\, KOVICHKA}"]
+    s7 -> s8[label = "\\"]
+    s8 -> s7[label = "Any"]
+    s7 -> str5[label = "KOVICHKA"]
+    
+
+    Start0 -> StartIdent20[label = "eps"]
+    StartIdent20 -> Ident3[label = "LETTER/{o, c}"]
+    Ident3 -> Ident3[label = "LETTER, DIGIT"]
+    
+    
+    Start0 -> StartKeyword22[label = "eps"]
+    StartKeyword22 -> Ident9[label = "o"]
+    Ident9 -> Ident10[label = "p"]
+    Ident9 -> Ident3[label = "ELSE"]
+    Ident10 -> Ident11[label = "e"]
+    Ident10 -> Ident3[label = "ELSE"]
+    Ident11 -> keyword4[label = "n"]
+    Ident11 -> Ident3[label = "ELSE"]
+    StartKeyword22 -> Ident12[label = "c"]
+     
+    Ident12 -> Ident13[label = "l"]
+    Ident12 -> Ident3[label = "ELSE"]
+    Ident13 -> Ident14[label = "o"]
+    Ident13 -> Ident3[label = "ELSE"]
+    Ident14 -> Ident15[label = "s"]
+    Ident14 -> Ident3[label = "ELSE"]
+    Ident15 -> keyword4[label = "e"]
+    Ident15 -> Ident3[label = "ELSE"]
+    
+    
+    Start0 -> StartOper21[label = "eps"]
+    StartOper21 ->  s16[label = "<"]
+    StartOper21 ->  s17[label = ">"]
+    s16 -> Oper6[label = "<"]
+    s17 -> Oper6[label = ">"]
+    
+}
+```
+
+Граф детерминированного распознавателя:
+
+```dot
+digraph {
+    rankdir=LR ;
+    Start0 [shape=circle]
+    Number1 [shape=doublecircle]
+    WhiteSpace2 [shape=doublecircle]
+    Ident3 [shape=doublecircle]
+    keyword4 [shape=doublecircle]
+    str5 [shape=doublecircle]
+    Oper6  [shape=doublecircle]
+    s7 [shape=circle]
+    s8 [shape=circle]
+    Ident9 [shape=circle]
+    Ident10 [shape=circle]
+    Ident11 [shape=circle]
+    Ident12 [shape=circle]
+    Ident13 [shape=circle]
+    Ident14 [shape=circle]
+    Ident15 [shape=circle]
+    s16 [shape=circle]
+    s17 [shape=circle]
+
+    
+    Start0 -> Number1[label = "DIGIT/0"]
+    Number1 -> Number1[label = "DIGIT"]
+    
+    Start0 -> WhiteSpace2[label = "_,\\t,\\n"]
+    WhiteSpace2 -> WhiteSpace2[label =  "_,\\t,\\n"]
+    Start0 -> s7[label = "KOVICHKA"]
+    s7 -> s7[label = "Any/{\\, KOVICHKA}"]
+    s7 -> s8[label = "\\"]
+    s8 -> s7[label = "Any"]
+    s7 -> str5[label = "KOVICHKA"]
+    
+
+    Start0 -> Ident3[label = "LETTER/{o, c}"]
+    Ident3 -> Ident3[label = "LETTER, DIGIT"]
+    
+    Start0 -> Ident9[label = "o"]
+    Ident9 -> Ident10[label = "p"]
+    Ident9 -> Ident3[label = "ELSE"]
+    Ident10 -> Ident11[label = "e"]
+    Ident10 -> Ident3[label = "ELSE"]
+    Ident11 -> keyword4[label = "n"]
+    Ident11 -> Ident3[label = "ELSE"]
+    Start0 -> Ident12[label = "c"]
+     
+    Ident12 -> Ident13[label = "l"]
+    Ident12 -> Ident3[label = "ELSE"]
+    Ident13 -> Ident14[label = "o"]
+    Ident13 -> Ident3[label = "ELSE"]
+    Ident14 -> Ident15[label = "s"]
+    Ident14 -> Ident3[label = "ELSE"]
+    Ident15 -> keyword4[label = "e"]
+    Ident15 -> Ident3[label = "ELSE"]
+    
+    
+    Start0 -> s16[label = "<"]
+    Start0 -> s17[label = ">"]
+    s16 -> Oper6[label = "<"]
+    s17 -> Oper6[label = ">"]
+    
+}
+```
+
+Реализация распознавателя:
+
+Файл `main.py`:
+```python
 import string
 class Coord:
     line = 0
@@ -232,3 +409,35 @@ with open(r"test.txt", "r") as f:
     auto = Automata([i for i in range(len(trans))], trans, initial, accepting, mark)
     for token in get_tokens(program, auto):
         print(token)
+```
+
+…
+
+# Тестирование
+
+Входные данные
+
+```
+open << clos1
+"ejafjsjfekesfk
+adsffa" >> close
+```
+
+Вывод на `stdout`
+
+```
+(Ident arg=open segment=(From (line=1 col=1) to (line=1 col=5)))
+(Operator arg=<< segment=(From (line=1 col=6) to (line=1 col=8)))
+(Ident arg=clos1 segment=(From (line=1 col=9) to (line=1 col=14)))
+(StrLiter arg="ejafjsjfekesfk
+adsffa" segment=(From (line=2 col=1) to (line=3 col=8)))
+(Operator arg=>> segment=(From (line=3 col=9) to (line=3 col=11)))
+(Ident arg=close segment=(From (line=3 col=12) to (line=3 col=17)))
+(End of Program coord=(line=3 col=17))
+```
+
+# Вывод
+При выполнении лабораторной работы был разработан лексический распознаватель, было 
+изучено: создание регулярный выражения для токенов, построение по этим регулярных 
+выражения автомата и его детерминизация, а также представление этого автомата 
+в программе.

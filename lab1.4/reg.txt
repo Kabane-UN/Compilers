@@ -1,9 +1,9 @@
-(1|2|3|4|5|6|7|8|9|0)(1|2|3|4|5|6|7|8|9|0)*
-(a)(a|1)*
-(\n|\t| )
+(DIGIT\0)(DIGIT)*
+(\n|\t| )+
 open|close
 <<|>>
-"(y|\")*"
+"(Any|\")*"
+(LETTER\{o,c})(LETTER|DIGIT)*
 
 digraph {
     rankdir=LR ;
