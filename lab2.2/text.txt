@@ -1,0 +1,35 @@
+program -> outerblockstm
+outerblockstm -> subdecl \n outerblockstm| funcdef \n outerblockstm |
+                 stm  \n outerblockstm | \n outerblockstm | stm | funcdef | eps
+funcdef -> Function Var ( params ) \n blockstm End Function
+subcdef -> Sub VarName ( params ) \n blockstm End Sub
+blockstm -> stm \n blockstm | \n blockstm | stm | eps
+Var -> VarName type
+params -> Var , params | Var | apply , params | apply | eps 
+type -> % | ! | & | # | $
+VarDecl -> Var = Expr
+ArrSet -> Apply = Expr
+ArrSet -> Indexes = Expr
+ArrDecl -> Dim apply
+apply -> Var ( ApplyArgs ) | Var ()
+ApplyArgs -> Expr  , NApplyArgs | Expr | eps
+stm -> VarDecl | ArrDecl | ArrSet | IfStm | IFElseStm | ForStm | DoWhileStm | DoUntilStm | DoLoopWStm | 
+        DoLoopUStm | DoLoopStm
+
+Const -> INTCONST | STRCONST
+Expr → Term | Expr AddOp Term
+AddOp → + | -
+Term → Power  | Term MulOp Power
+MulOp → * | /
+Power → apply | Idexes | Const | Var | ( Expr )
+CmpOp -> >= | <= | < | > | == | <> 
+Idexes -> Var [ Const ]
+IfStm -> If Expr CmpOp Expr Then \n blockstm End If
+IFElseStm -> If Expr CmpOp Expr Then \n blockstm ELSE \n blockstm  End If
+ForStm -> For VarDecl to Expr \n blockstm Next Var
+DoWhileStm -> Do While Expr CmpOp Expr \n blockstm  Loop
+DoUntilStm -> Do Until Expr CmpOp Expr \n blockstm  Loop 
+DoLoopWStm -> Do \n  blockstm Loop While Expr CmpOp Expr
+DoLoopUStm -> Do  \n blockstm Loop Until Expr CmpOp Expr
+DoLoopStm -> Do \n blockstm Loop
+
