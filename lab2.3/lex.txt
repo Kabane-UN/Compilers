@@ -1,0 +1,13 @@
+Grammar ::= TermInit Grammar | Axiom Grammar | Rule Grammar
+Axiom ::= StartToken IdentToken DotToken
+Rule ::= IdentToken IsToken IdentSeq DotToken
+IdentSeq ::= IdentToken IdentSeq | eps
+TermInit ::= TokensToken IdentToken CommaSeq DotToken
+CommaSeq ::= CommaToken IdentToken CommaSeq | eps
+
+StartToken -> start
+TokensToken -> tokens 
+CommaToken -> ,
+DotToken -> \.
+IsToken -> is 
+IdentToken -> <[a-zA-Z-0-9 ]*>
