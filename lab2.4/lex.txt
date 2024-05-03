@@ -1,0 +1,21 @@
+NProgram -> NOuterBlockStm
+NVar -> VARNAME  NType
+NType -> % | | ! | & | # | $
+NOuterBlockStm ->  { { NFuncDef | NSubDecl | NStm } { \n NFuncDef | NSubDecl | NStm }* \n}?
+NFuncDef -> KW_FUNC  NVar  (  NParams  ) \n  NBlockStm  KW_END  KW_FUNC 
+NSubDecl -> KW_SUB  VARNAME (  NParams  ) \n  NBlockStm  KW_END  KW_SUB 
+NBlockStm ->  { NStm { \n NStm}* \n}?
+NParams -> { NVarAction { ,  NVarAction }* }?
+NAssignExpr -> NVarAction = NExpr
+NVarAction -> NVar | NVar  (  NApplyArgs  ) | NVar  [  NConst  ]
+NArrDecl -> KW_DIM  NVar  (  NApplyArgs  )
+NApplyArgs -> { NExpr { ,  NExpr }* }?
+NStm -> NAssignExpr | NArrDecl | NIfStm | NForStm | NDoWhileUntilLoopStm
+NConst -> INTEGER | STRING
+NExpr -> NTerm { {+  | -} NTerm }*
+NTerm -> NFactor { { * | / } NFactor }*
+NFactor -> NVarAction  | NConst   | (  NExpr  )
+NCmpOp -> <  | <=  | >  | >=  | ==  | <>
+NIfStm -> KW_IF  NExpr  NCmpOp  NExpr  KW_THEN \n  NBlockStm { KW_ELSE  \n  NBlockStm }? KW_END  KW_IF  
+NForStm -> KW_FOR  NAssignExpr  KW_TO  NExpr \n  NBlockStm  KW_NEXT  NVar  
+NDoWhileUntilLoopStm -> KW_DO  {KW_WHILE | KW_UNTIL}  NExpr  NCmpOp  NExpr \n  NBlockStm  KW_LOOP  | KW_DO \n   NBlockStm KW_LOOP  { {KW_WHILE | KW_UNTIL}  NExpr  NCmpOp  NExpr }?

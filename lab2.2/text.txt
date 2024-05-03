@@ -9,9 +9,9 @@ params -> Var , params | Var | apply , params | apply | eps
 type -> % | ! | & | # | $
 VarDecl -> Var = Expr
 ArrSet -> Apply = Expr
-ArrSet -> Indexes = Expr
+ArrSet -> Idexes = Expr
 ArrDecl -> Dim apply
-apply -> Var ( ApplyArgs ) | Var ()
+Apply -> Var ( ApplyArgs ) | Var ()
 ApplyArgs -> Expr  , NApplyArgs | Expr | eps
 stm -> VarDecl | ArrDecl | ArrSet | IfStm | IFElseStm | ForStm | DoWhileStm | DoUntilStm | DoLoopWStm | 
         DoLoopUStm | DoLoopStm
