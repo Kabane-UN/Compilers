@@ -1,0 +1,13 @@
+{
+    (Grammar, StartToken): [Axiom, Grammar],
+    (Axiom, StartToken): [StartToken, IdentToken, DotToken],
+    (Grammar, IdentToken): [Rule, Grammar],
+    (Rule, IdentToken): [IdentToken, IsToken, IdentSeq, DotToken],
+    (IdentSeq, IdentToken): [IdentToken, IdentSeq],
+    (IdentSeq, DotToken): [],
+    (Grammar, TokensToken): [TermInit, Grammar],
+    (TermInit, TokensToken): [TokensToken, IdentToken, CommaSeq, DotToken],
+    (CommaSeq, CommaToken): [CommaToken, IdentToken, CommaSeq],
+    (CommaSeq, DotToken): [],
+    (Grammar, EOPToken): []
+}

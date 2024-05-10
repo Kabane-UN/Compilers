@@ -1,0 +1,36 @@
+tokens <Is>, <Dot>, <Comma>, <Tokens>, <Start>, <Ident>.
+<Grammar> is <TermInit> <Grammar>.
+<Grammar> is <Axiom> <Grammar>.
+<Grammar> is <Rule> <Grammar>.
+<Grammar> is .
+<Axiom> is <Start> <Ident> <Dot> .
+<Rule> is <Ident> <Is> <IdentSeq> <Dot> .
+<IdentSeq> is <Ident> <IdentSeq> .
+<IdentSeq> is .
+<TermInit> is <Tokens> <Ident> <CommaSeq> <Dot>
+<CommaSeq> is <Comma> <Ident> <CommaSeq>
+<CommaSeq> is .
+start <Grammar> .
+
+from symbol_types import *
+
+table: dict[Any, Any] = {
+    (E, left_paren_token): [T, E_1],
+    (E, n_token): [T, E_1],
+    (E_1, plus_sign_token): [plus_sign_token, T, E_1],
+    ....
+}
+
+
+# symbol_types.py
+@dataclass
+class left_paren_token(Token):
+    pass
+
+@dataclass
+class n_token(Token):
+    pass
+
+
+class E(InnerNode):
+    pass

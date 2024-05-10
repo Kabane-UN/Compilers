@@ -1,0 +1,12 @@
+tokens <Add>, <Sub>, <Mul>, <Div>, <Num>, <RightParen>, <LeftParen>.
+<Expr> is <Term> <SubAddSeq>.
+<SubAddSeq> is <Add> <Term> <SubAddSeq>.
+<SubAddSeq> is <Sub> <Term> <SubAddSeq>.
+<SubAddSeq> is .
+<Term> is <Factor> <MulDivSeq>.
+<MulDivSeq> is <Mul> <Factor> <MulDivSeq>.
+<MulDivSeq> is <Div> <Factor> <MulDivSeq>.
+<MulDivSeq> is .
+<Factor> is <Num> .
+<Factor> is <LeftParen>  <Expr>  <RightParen>.
+start <Expr>.

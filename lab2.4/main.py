@@ -466,7 +466,7 @@ class Comment:
     def __str__(self) -> str:
         return "(Comment " + self.text + " )"
 
-class Scanner:
+class Scanner: 
     program: str
     def __init__(self, compiler: 'Compiler',
                   program: str) -> None:
@@ -477,14 +477,13 @@ class Scanner:
         panic = False
         all_key_tokens:list[type] = [FuncToken, EndToken, ForToken, NextToken, ElseToken,
                                       DoToken, ThenToken, WhileToken, UntilToken, DimToken,
-                                        ToToken, IfToken, SubToken, 
+                                        ToToken, IfToken, SubToken, LoopToken,
                                      IntTypeToken, LongTypeToken, FloatTypeToken,
                                        DoubleTypeToken,
                                        StrTypeToken, OpenBrToken, CloseBrToken,
                                          CloseRectBrToken,
                                          OpenRectBrToken,
-                                     CommaToken, AssignToken, LTToken, LEToken, GTToken,
-                                       GEToken, EQToken, NEToken, NewLineToken, AddToken,
+                                     CommaToken,LEToken,EQToken,NEToken,GEToken, AssignToken,NEToken, LTToken, GTToken, NewLineToken, AddToken,
                                          ResToken, MulToken, DivToken]
         all_key_first:list[str] = [i.attr[0] for i in all_key_tokens]
         while self._position.read() != '':
@@ -747,8 +746,11 @@ def sym_check(t: type, tokens: Generator[Token, None, None]):
     global sym
     if type(sym) == t:
         old = sym
-        sym = next(tokens)
-        return old
+        if t != EOPToken:
+            sym = next(tokens)
+            return old
+        else:
+            return None
     else:
         raise Exception(f'Expected {t} got {type(sym)} as {sym}')
 def sym_checks(ts: list[type], tokens: Generator[Token, None, None]):
@@ -761,10 +763,14 @@ def sym_checks(ts: list[type], tokens: Generator[Token, None, None]):
     else:
         raise Exception(f'Expected {ts} got {type(sym)} as {sym}')
 
+# NProgram -> NOuterBlockStm
 def parse_program(tokens: Generator[Token, None, None]) -> Program:
     global sym
-    return Program(parse_outer_block_stm(tokens))
+    program = Program(parse_outer_block_stm(tokens))
+    sym_check(EOPToken, tokens)
+    return program
 
+# NOuterBlockStm ->  { { NFuncDef | NSubDecl | NStm } { \n NFuncDef | NSubDecl | NStm }* \n}?
 def parse_outer_block_stm(tokens: Generator[Token, None, None]) -> OuterBlockStm:
     global sym
     outer_stms: list[FuncDecl|Stm|SubDecl] = []
@@ -802,9 +808,13 @@ def parse_outer_block_stm(tokens: Generator[Token, None, None]) -> OuterBlockStm
             outer_stms.append(parse_for_stm(tokens))
         elif type(sym) == DoToken:
             outer_stms.append(parse_do_while_until_loop_stm(tokens))
+        elif type(sym) == NewLineToken:
+            pass
         else:
             return OuterBlockStm(outer_stms)
     return OuterBlockStm(outer_stms)
+
+# NVar -> VARNAME  NType
 def parse_var(tokens: Generator[Token, None, None]) -> Var:
     global sym
     ident = sym_check(IdentToken, tokens)
@@ -825,6 +835,7 @@ def parse_func_decl(tokens: Generator[Token, None, None]) -> FuncDecl:
     sym_check(EndToken, tokens)
     sym_check(FuncToken, tokens)
     return FuncDecl(var, params, body)
+# NSubDecl -> KW_SUB  VARNAME (  NParams  ) \n  NBlockStm  KW_END  KW_SUB 
 def parse_sub_decl(tokens: Generator[Token, None, None]) -> SubDecl:
     global sym
     sym_check(SubToken, tokens)
@@ -837,6 +848,7 @@ def parse_sub_decl(tokens: Generator[Token, None, None]) -> SubDecl:
     sym_check(EndToken, tokens)
     sym_check(SubToken, tokens)
     return SubDecl(str(var.attr), params, body)
+# NAssignExpr -> NVarAction = NExpr
 def parse_assign_expr(tokens: Generator[Token, None, None]) -> AssignExpr:
     global sym
     var_action = parse_var_action(tokens)
@@ -925,6 +937,8 @@ def parse_block_stm(tokens: Generator[Token, None, None]) -> BlockStm:
             stms.append(parse_for_stm(tokens))
         elif type(sym) == DoToken:
             stms.append(parse_do_while_until_loop_stm(tokens))
+        elif type(sym) == NewLineToken:
+            pass
         else:
             return BlockStm(stms)
     return BlockStm(stms)
@@ -962,7 +976,7 @@ def parse_factor(tokens: Generator[Token, None, None]) -> BinExpr|VarAction|Cons
         expr = parse_expr(tokens)
         sym_check(CloseBrToken, tokens)
     else:
-        raise Exception
+        raise Exception(f'Expected {IdentToken} {StringToken} {IntegerToken} {OpenBrToken} got {type(sym)} as {sym}')
     return expr
 # NCmpOp -> <  | <=  | >  | >=  | ==  | <>
 def parse_cmp_op(tokens: Generator[Token, None, None]) -> Token:
@@ -986,6 +1000,7 @@ def parse_if_stm(tokens: Generator[Token, None, None]) -> IfStm:
     body = parse_block_stm(tokens)
     else_body = None
     if type(sym) == ElseToken:
+        sym = next(tokens)
         sym_check(NewLineToken, tokens)
         else_body = parse_block_stm(tokens)
     sym_check(EndToken, tokens)
@@ -1011,6 +1026,7 @@ def parse_do_while_until_loop_stm(tokens: Generator[Token, None, None]) -> DoWhi
         flag = False
         if type(sym) == UntilToken:
             flag = True
+        sym = next(tokens)
         expr1 = parse_expr(tokens)
         cmp_op = parse_cmp_op(tokens)
         expr2 = parse_expr(tokens)
@@ -1056,6 +1072,11 @@ with open(r"test.txt", "r") as f:
             program += line
     compiler: Compiler = Compiler()
     scanner = compiler.get_scanner(program)
+    # for token in scanner.tokens():
+    #     print(token)
     tokens = scanner.tokens()
     sym = next(tokens)
-    pprint(parse_program(tokens))
+    try:
+        pprint(parse_program(tokens))
+    except Exception as ex:
+        print(ex)

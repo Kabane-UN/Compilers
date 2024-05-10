@@ -1,0 +1,13 @@
+tokens <Is>, <Dot>, <Comma>, <Tokens>, <Start>, <Ident>.
+<Grammar> is <TermInit> <Grammar>.
+<Grammar> is <Axiom> <Grammar>.
+<Grammar> is <Rule> <Grammar>.
+<Grammar> is .
+<Axiom> is <Start> <Ident> <Dot> .
+<Rule> is <Ident> <Is> <IdentSeq> <Dot> .
+<IdentSeq> is <Ident> <IdentSeq> .
+<IdentSeq> is .
+<TermInit> is <Tokens> <Ident> <CommaSeq> <Dot> .
+<CommaSeq> is <Comma> <Ident> <CommaSeq> .
+<CommaSeq> is .
+start <Grammar> .

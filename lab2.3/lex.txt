@@ -1,4 +1,4 @@
-Grammar ::= TermInit Grammar | Axiom Grammar | Rule Grammar
+Grammar ::= TermInit Grammar | Axiom Grammar | Rule Grammar | eps
 Axiom ::= StartToken IdentToken DotToken
 Rule ::= IdentToken IsToken IdentSeq DotToken
 IdentSeq ::= IdentToken IdentSeq | eps

@@ -10,3 +10,4 @@ tokens <left paren>, <right paren>.
 <F>   is <left paren> <E> <right paren>.
 <!-- аксиома -->
 start <E>.
+
