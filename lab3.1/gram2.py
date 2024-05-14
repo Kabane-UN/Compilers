@@ -1,66 +1,72 @@
 from abc import ABC
 from typing import Any
 
+
 class Token(ABC):
-	attr: Any
+    attr: Any
+
+
 ...
 
-class ExprBase(ABC):
-	...
 
-class TermBase(ABC):
-	...
+class ExprBase(ABC): ...
 
-class SubAddSeqBase(ABC):
-	...
 
-class FactorBase(ABC):
-	...
+class TermBase(ABC): ...
 
-class MulDivSeqBase(ABC):
-	...
 
-class AddBaseToken(Token):
-	...
+class SubAddSeqBase(ABC): ...
 
-class SubBaseToken(Token):
-	...
 
-class MulBaseToken(Token):
-	...
+class FactorBase(ABC): ...
 
-class DivBaseToken(Token):
-	...
 
-class NumBaseToken(Token):
-	...
+class MulDivSeqBase(ABC): ...
 
-class RightParenBaseToken(Token):
-	...
 
-class LeftParenBaseToken(Token):
-	...
+class AddBaseToken(Token): ...
 
-class EOPBaseToken(Token, ABC):
-	...
+
+class SubBaseToken(Token): ...
+
+
+class MulBaseToken(Token): ...
+
+
+class DivBaseToken(Token): ...
+
+
+class NumBaseToken(Token): ...
+
+
+class RightParenBaseToken(Token): ...
+
+
+class LeftParenBaseToken(Token): ...
+
+
+class EOPBaseToken(Token, ABC): ...
 
 
 parse_table = {
-	(ExprBase, NumBaseToken): [TermBase, SubAddSeqBase], 
-	(ExprBase, LeftParenBaseToken): [TermBase, SubAddSeqBase], 
-	(TermBase, NumBaseToken): [FactorBase, MulDivSeqBase], 
-	(TermBase, LeftParenBaseToken): [FactorBase, MulDivSeqBase], 
-	(SubAddSeqBase, AddBaseToken): [AddBaseToken, TermBase, SubAddSeqBase], 
-	(SubAddSeqBase, SubBaseToken): [SubBaseToken, TermBase, SubAddSeqBase], 
-	(SubAddSeqBase, RightParenBaseToken): [], 
-	(SubAddSeqBase, EOPBaseToken): [], 
-	(FactorBase, NumBaseToken): [NumBaseToken], 
-	(FactorBase, LeftParenBaseToken): [LeftParenBaseToken, ExprBase, RightParenBaseToken], 
-	(MulDivSeqBase, MulBaseToken): [MulBaseToken, FactorBase, MulDivSeqBase], 
-	(MulDivSeqBase, DivBaseToken): [DivBaseToken, FactorBase, MulDivSeqBase], 
-	(MulDivSeqBase, AddBaseToken): [], 
-	(MulDivSeqBase, SubBaseToken): [], 
-	(MulDivSeqBase, RightParenBaseToken): [], 
-	(MulDivSeqBase, EOPBaseToken): [], 
+    (ExprBase, NumBaseToken): [TermBase, SubAddSeqBase],
+    (ExprBase, LeftParenBaseToken): [TermBase, SubAddSeqBase],
+    (TermBase, NumBaseToken): [FactorBase, MulDivSeqBase],
+    (TermBase, LeftParenBaseToken): [FactorBase, MulDivSeqBase],
+    (SubAddSeqBase, AddBaseToken): [AddBaseToken, TermBase, SubAddSeqBase],
+    (SubAddSeqBase, SubBaseToken): [SubBaseToken, TermBase, SubAddSeqBase],
+    (SubAddSeqBase, RightParenBaseToken): [],
+    (SubAddSeqBase, EOPBaseToken): [],
+    (FactorBase, NumBaseToken): [NumBaseToken],
+    (FactorBase, LeftParenBaseToken): [
+        LeftParenBaseToken,
+        ExprBase,
+        RightParenBaseToken,
+    ],
+    (MulDivSeqBase, MulBaseToken): [MulBaseToken, FactorBase, MulDivSeqBase],
+    (MulDivSeqBase, DivBaseToken): [DivBaseToken, FactorBase, MulDivSeqBase],
+    (MulDivSeqBase, AddBaseToken): [],
+    (MulDivSeqBase, SubBaseToken): [],
+    (MulDivSeqBase, RightParenBaseToken): [],
+    (MulDivSeqBase, EOPBaseToken): [],
 }
-

@@ -2,11 +2,11 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import Generator, Any
 
+
 @dataclass
 class Node:
     name: type
     leafs: list[Any]
-
 
 
 def parse(scanner, sintax, axiom, end, token_class):
@@ -28,7 +28,7 @@ def parse(scanner, sintax, axiom, end, token_class):
                     parent.leafs.append(token)
                     break
                 else:
-                    print(f'Ожидался {rule} получен {type(token)} как  {token}')
+                    print(f"Ожидался {rule} получен {type(token)} как  {token}")
                     raise Exception
             elif (rule, token.__class__.__bases__[0]) in sintax.keys():
                 leaf = Node(rule, [])
@@ -37,8 +37,10 @@ def parse(scanner, sintax, axiom, end, token_class):
                 for i in to_add[::-1]:
                     tree_stack.append(leaf)
                     stack.append(i)
-                
+
             else:
-                print(f'Ожидался {rule} получен {token.__class__.__bases__[0]}  как  {token}')
+                print(
+                    f"Ожидался {rule} получен {token.__class__.__bases__[0]}  как  {token}"
+                )
                 raise Exception
     return first.leafs[0]
