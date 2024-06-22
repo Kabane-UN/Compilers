@@ -40,7 +40,8 @@ def parse(scanner, sintax, axiom, end, token_class):
 
             else:
                 print(
-                    f"Ожидался {rule} получен {token.__class__.__bases__[0]}  как  {token}"
+                    f"Ожидался {rule} получен {token.__class__.__bases__[0]} \
+                        как  {token}"
                 )
                 raise Exception
     return first.leafs[0]

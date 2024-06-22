@@ -1,4 +1,3 @@
-NProgram :== NOuterBlockStm
 NOuterBlockStm :== NSubDecl KW_NEWLINE  NOuterBlockStm
         | NFuncDef KW_NEWLINE  NOuterBlockStm 
         | NStm  KW_NEWLINE NOuterBlockStm 
@@ -12,7 +11,7 @@ NFuncDef :== KW_FUNC NVar KW_LEFT_PAREN NParams
         KW_RIGHT_PAREN  KW_NEWLINE  NBlockStm
         KW_END  KW_FUNC 
 NSubDecl:==
-        KW_SUB  IDENT  KW_LEFT_PAREN  NParams  
+        KW_SUB  IDENT[L]  KW_LEFT_PAREN  NParams  
         KW_RIGHT_PAREN  KW_NEWLINE  NBlockStm
         KW_END  KW_SUB 
 NStm:==   
@@ -24,6 +23,7 @@ NStm:==
         | NDoWhileStm
         | NDoUntilStm
         | NDoLoopStm
+        | COMMENT[C] 
 
 NParams:== 
         NVar KW_COMMA  NParams
@@ -31,7 +31,7 @@ NParams:==
         | NVar
         | NApply
         | epsNVar:== 
-        IDENT  NVarType
+        IDENT[L]  NVarType
         
 NVarType:==
         KW_INT 
@@ -76,14 +76,14 @@ NTerm:==
 NPower:== 
         NApply
         | NVar
-        | NUMBER 
-        | STRING 
+        | NUMBER[N] 
+        | STRING[S] 
         | NIndxes
         | KW_LEFT_PAREN  NExpr KW_RIGHT_PAREN 
         
 NIndxes:==
-        NVar KW_LEFT_RECT  NUMBER  KW_RIGHT_RECT 
-        | NVar KW_LEFT_RECT  STRING  KW_RIGHT_RECT 
+        NVar KW_LEFT_RECT  NUMBER[N]  KW_RIGHT_RECT 
+        | NVar KW_LEFT_RECT  STRING[S]  KW_RIGHT_RECT 
         
 NCmpOp:==
         KW_EQ 
@@ -95,11 +95,12 @@ NCmpOp:==
         
 NIfStm:==
         KW_IF  NExpr NCmpOp NExpr KW_THEN  
-        KW_NEWLINE  NBlockStm  
-        KW_ELSE  KW_NEWLINE 
-        NBlockStm  KW_END   KW_IF 
-        |  KW_IF  NExpr NCmpOp NExpr KW_THEN  
-        KW_NEWLINE  NBlockStm  KW_END   KW_IF     
+        KW_NEWLINE  NBlockStm  NElseStm KW_END   KW_IF 
+        
+NElseStm:==
+         KW_ELSE  KW_NEWLINE 
+        NBlockStm 
+        | eps        
 NForStm:==
         KW_FOR  NVarDecl KW_TO  NExpr 
         KW_NEWLINE  NBlockStm KW_NEXT   NVar
@@ -113,22 +114,15 @@ NDoUntilStm:==
         KW_DO  KW_UNTIL  NExpr NCmpOp NExpr 
         KW_NEWLINE 
         NBlockStm  KW_LOOP 
-
-NDoLoopWStm:== 
-        KW_DO  KW_NEWLINE   NBlockStm 
-        KW_LOOP   KW_WHILE 
-        NExpr  NCmpOp  NExpr 
-NDoLoopUStm:== 
-        KW_DO  KW_NEWLINE   NBlockStm 
-        KW_LOOP   KW_UNTIL 
-        NExpr  NCmpOp  NExpr 
-
-
+        
 NDoLoopStm:== 
         KW_DO  KW_NEWLINE   NBlockStm 
-        KW_LOOP 
+        NDoLoopTailStm
         
+NDoLoopTailStm:==
+        KW_LOOP   KW_WHILE 
+        NExpr  NCmpOp  NExpr 
+        | KW_LOOP   KW_UNTIL 
+        NExpr  NCmpOp  NExpr 
+        | KW_LOOP  
         
-[0-9]+ --> NUMBER
-[A-Za-z][A-Za-z0-9]* --> IDENT
-\".*\" --> STRING

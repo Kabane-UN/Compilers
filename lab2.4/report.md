@@ -1,3 +1,121 @@
+% Лабораторная работа № 2.4 «Рекурсивный спуск»
+% 6 мая 2024 г.
+% Андрей Кабанов, ИУ9-62Б
+
+# Цель работы
+
+Целью данной работы является изучение алгоритмов построения парсеров методом
+рекурсивного спуска.
+
+# Индивидуальный вариант
+
+Диалект Бейсика
+
+```
+' Суммирование элементов массива
+Function SumArray#(Values#())
+  SumArray# = 0
+  For i% = 1 To Len%(Values#)
+    SumArray# = SumArray# + Values#(i%)
+  Next i%
+End Function
+
+' Вычисление многочлена по схеме Горнера
+Function Polynom!(x!, coefs!())
+  Polynom! = 0
+  For i% = 1 to Len%(coefs!)
+    Polynom! = Polynom! * x! + coefs!(i%)
+  Next i%
+End Function
+
+' Вычисление многочлена x³ + x² + x + 1
+Function Polynom1111!(x!)
+  Dim coefs!(4)
+
+  For i% = 1 To 4
+    coefs!(i%) = 1
+  Next i%
+
+  Polynom1111! = Polynom!(x!, coefs!)
+End Function
+
+' Инициализация массива числами Фибоначчи
+Sub Fibonacci(res&())
+  n% = Len%(res&)
+
+  If n% >= 1 Then
+    res&(1) = 1
+  End If
+
+  If n% >= 2 Then
+    res&(2) = 1
+  End If
+
+  i% = 3
+  Do While i% <= n%
+    res&(i%) = res&(i% - 1) + res&(i% - 2)
+    i% = i% + 1
+  Loop
+End Sub
+
+' Склеивание элементов массива через разделитель: Join$(", ", words)
+Function Join$(sep$, items$())
+  If Len(items$) >= 1 Then
+    Join$ = items$[1]
+  Else
+    Join$ = ""
+  End If
+
+  For i% = 2 To Len%(items$)
+    Join$ = Join$ + sep$ + items$(i%)
+  Next i%
+End Function
+```
+
+# Реализация
+
+## Лексическая структура
+
+```
+[0-9]+ --> NUMBER
+[A-Za-z][A-Za-z0-9]*--> IDENT
+\".*\" --> STRING
+```
+
+## Грамматика языка
+
+```
+NProgram -> NOuterBlockStm
+NVar -> VARNAME  NType
+NType -> % | | ! | & | # | $
+NOuterBlockStm ->  { { NFuncDef | NSubDecl | NStm }
+{ \n NFuncDef | NSubDecl | NStm }*\n}?
+NFuncDef -> KW_FUNC  NVar  (  NParams  ) \n  NBlockStm  KW_END  KW_FUNC
+NSubDecl -> KW_SUB  VARNAME (  NParams  ) \n  NBlockStm  KW_END  KW_SUB
+NBlockStm ->  { NStm { \n NStm}* \n}?
+NParams -> { NVarAction { ,  NVarAction }*}?
+NAssignExpr -> NVarAction = NExpr
+NVarAction -> NVar | NVar  (  NApplyArgs  ) | NVar  [  NConst  ]
+NArrDecl -> KW_DIM  NVar  (  NApplyArgs  )
+NApplyArgs -> { NExpr { ,  NExpr }* }?
+NStm -> NAssignExpr | NArrDecl | NIfStm | NForStm | NDoWhileUntilLoopStm
+NConst -> INTEGER | STRING
+NExpr -> NTerm { {+  | -} NTerm }*
+NTerm -> NFactor { {* | / } NFactor }*
+NFactor -> NVarAction  | NConst   | (  NExpr  )
+NCmpOp -> <  | <=  | >  | >=  | ==  | <>
+NIfStm -> KW_IF  NExpr  NCmpOp  NExpr  KW_THEN \n  NBlockStm { KW_ELSE  \n  
+NBlockStm }?
+KW_END  KW_IF  
+NForStm -> KW_FOR  NAssignExpr  KW_TO  NExpr \n  NBlockStm  KW_NEXT  NVar  
+NDoWhileUntilLoopStm -> KW_DO  {KW_WHILE | KW_UNTIL}  NExpr  NCmpOp  NExpr \n  NBlockStm
+KW_LOOP  | KW_DO \n   NBlockStm KW_LOOP  
+{ {KW_WHILE | KW_UNTIL}  NExpr  NCmpOp  NExpr }?
+```
+
+## Программная реализация
+
+```python
 from typing import Generator
 from dataclasses import dataclass
 from typing import Any
@@ -1347,7 +1465,9 @@ def parse_for_stm(tokens: Generator[Token, None, None]) -> ForStm:
     return ForStm(assign, expr, body, var)
 
 
-# NDoWhileUntilLoopStm -> KW_DO  {KW_WHILE | KW_UNTIL}  NExpr  NCmpOp  NExpr \n  NBlockStm  KW_LOOP  | KW_DO \n   NBlockStm KW_LOOP  { {KW_WHILE | KW_UNTIL}  NExpr  NCmpOp  NExpr }?
+# NDoWhileUntilLoopStm -> KW_DO  {KW_WHILE | KW_UNTIL}  
+# NExpr  NCmpOp  NExpr \n  NBlockStm  KW_LOOP  | KW_DO \n   
+# NBlockStm KW_LOOP  { {KW_WHILE | KW_UNTIL}  NExpr  NCmpOp  NExpr }?
 def parse_do_while_until_loop_stm(
     tokens: Generator[Token, None, None]
 ) -> DoWhileStm | DoLoopStm | DoUntilStm | DoLoopWStm | DoLoopUStm:
@@ -1420,3 +1540,72 @@ with open(r"test.txt", "r") as f:
         pprint(parse_program(tokens))
     except Exception as ex:
         print(ex)
+
+```
+
+# Тестирование
+
+Входные данные
+
+```
+' Суммирование элементов массива
+Function SumArray#(Values#())
+  SumArray# = 0
+  For i% = 1 To Len%(Values#)
+    SumArray# = SumArray# + Values#(i%)
+  Next i%
+End Function
+```
+
+Вывод на `stdout`
+
+<!-- ENABLE LONG LINES -->
+```txt
+Program(outer_block_stm=OuterBlockStm(outer_stms=[FuncDecl(var=Var(name=IdentToken(Fragment(Coord(2, 10), Coord(2, 18)), 0),
+                                                                   type=DoubleTypeToken(Fragment(Coord(2, 18), Coord(2, 19)))),
+                                                           params=Params(items=[VarAction(var=Var(name=IdentToken(Fragment(Coord(2, 20), Coord(2, 26)), 1),
+                                                                                                  type=DoubleTypeToken(Fragment(Coord(2, 26), Coord(2, 27)))),
+                                                                                          const=None,
+                                                                                          apply_params=ApplyArgs(items=[]))]),
+                                                           body=BlockStm(stms=[AssignExpr(var=VarAction(var=Var(name=IdentToken(Fragment(Coord(3, 3), Coord(3, 11)), 0),
+                                                                                                                type=DoubleTypeToken(Fragment(Coord(3, 11), Coord(3, 12)))),
+                                                                                                        const=None,
+                                                                                                        apply_params=None),
+                                                                                          expr=ConstExpr(value=IntegerToken(Fragment(Coord(3, 15), Coord(3, 16))))),
+                                                                               ForStm(var_decl=AssignExpr(var=VarAction(var=Var(name=IdentToken(Fragment(Coord(4, 7), Coord(4, 8)), 2),
+                                                                                                                                type=IntTypeToken(Fragment(Coord(4, 8), Coord(4, 9)))),
+                                                                                                                        const=None,
+                                                                                                                        apply_params=None),
+                                                                                                          expr=ConstExpr(value=IntegerToken(Fragment(Coord(4, 12), Coord(4, 13))))),
+                                                                                      to=VarAction(var=Var(name=IdentToken(Fragment(Coord(4, 17), Coord(4, 20)), 3),
+                                                                                                           type=IntTypeToken(Fragment(Coord(4, 20), Coord(4, 21)))),
+                                                                                                   const=None,
+                                                                                                   apply_params=ApplyArgs(items=[VarAction(var=Var(name=IdentToken(Fragment(Coord(4, 22), Coord(4, 28)), 1),
+                                                                                                                                                   type=DoubleTypeToken(Fragment(Coord(4, 28), Coord(4, 29)))),
+                                                                                                                                           const=None,
+                                                                                                                                           apply_params=None)])),
+                                                                                      body=BlockStm(stms=[AssignExpr(var=VarAction(var=Var(name=IdentToken(Fragment(Coord(5, 5), Coord(5, 13)), 0),
+                                                                                                                                           type=DoubleTypeToken(Fragment(Coord(5, 13), Coord(5, 14)))),
+                                                                                                                                   const=None,
+                                                                                                                                   apply_params=None),
+                                                                                                                     expr=BinExpr(left=VarAction(var=Var(name=IdentToken(Fragment(Coord(5, 17), Coord(5, 25)), 0),
+                                                                                                                                                         type=DoubleTypeToken(Fragment(Coord(5, 25), Coord(5, 26)))),
+                                                                                                                                                 const=None,
+                                                                                                                                                 apply_params=None),
+                                                                                                                                  op=AddToken(Fragment(Coord(5, 27), Coord(5, 28))),
+                                                                                                                                  right=VarAction(var=Var(name=IdentToken(Fragment(Coord(5, 29), Coord(5, 35)), 1),
+                                                                                                                                                          type=DoubleTypeToken(Fragment(Coord(5, 35), Coord(5, 36)))),
+                                                                                                                                                  const=None,
+                                                                                                                                                  apply_params=ApplyArgs(items=[VarAction(var=Var(name=IdentToken(Fragment(Coord(5, 37), Coord(5, 38)), 2),
+                                                                                                                                                                                                  type=IntTypeToken(Fragment(Coord(5, 38), Coord(5, 39)))),
+                                                                                                                                                                                          const=None,
+                                                                                                                                                                                          apply_params=None)]))))]),
+                                                                                      next_var=Var(name=IdentToken(Fragment(Coord(6, 8), Coord(6, 9)), 2),
+                                                                                                   type=IntTypeToken(Fragment(Coord(6, 9), Coord(6, 10)))))]))]))
+```
+
+# Вывод
+
+При выполнении лабораторной работы были приобретены навыки написания
+синтаксического анализатора методом рекурсивного спуска, а также была написана
+ll1 грамматика языка.

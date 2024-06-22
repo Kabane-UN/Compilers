@@ -2,12 +2,12 @@
 Function SumArray#(Values#())
   SumArray# = 0
   For i% = 1 To Len%(Values#)
-    SumArray = SumArray# + Values#(i%)
+    SumArray# = SumArray# + Values#(i%)
   Next i%
 End Function
 
 ' Вычисление многочлена по схеме Горнера
-Function SumArray!(x!, coefs!())
+Function Polynom!(x!, coefs!())
   Polynom! = 0
   For i% = 1 to Len%(coefs!)
     Polynom! = Polynom! * x! + coefs!(i%)
